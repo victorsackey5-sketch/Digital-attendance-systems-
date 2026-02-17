@@ -1,0 +1,114 @@
+#include <iostream>
+#include <limits>
+#include "StudentManager.h"
+#include "AttendanceManager.h"
+#include "Utils.h"
+
+using namespace std;
+
+void studentMenu(StudentManager& sm) {
+    int choice;
+    do {
+        Utils::clearScreen();
+        cout << "\n=== STUDENT MANAGEMENT ===\n";
+        cout << "1. Register New Student\n";
+        cout << "2. View All Students\n";
+        cout << "3. Search Student\n";
+        cout << "4. Back to Main\n";
+        cout << "Choice: ";
+        cin >> choice;
+        cin.ignore();
+        
+        switch(choice) {
+            case 1: {
+                string n, i, p;
+                int y;
+                cout << "Name: "; getline(cin, n);
+                cout << "Index: "; getline(cin, i);
+                cout << "Program: "; getline(cin, p);
+                cout << "Year: "; cin >> y;
+                sm.addStudent(Student(n, i, p, y));
+                sm.saveStudentsToFile();
+                break;
+            }
+            case 2:
+                sm.viewAllStudents();
+                break;
+            case 3: {
+                string i;
+                cout << "Index: "; getline(cin, i);
+                sm.searchStudentByIndex(i);
+                break;
+            }
+        }
+        if (choice != 4) Utils::pause();
+    } while (choice != 4);
+}
+
+void attendanceMenu(AttendanceManager& am) {
+    int choice;
+    do {
+        Utils::clearScreen();
+        cout << "\n=== ATTENDANCE MANAGEMENT ===\n";
+        cout << "1. Create New Session\n";
+        cout << "2. Mark Attendance\n";
+        cout << "3. Update Attendance\n";
+        cout << "4. Back to Main\n";
+        cout << "Choice: ";
+        cin >> choice;
+        
+        switch(choice) {
+            case 1: am.createNewSession(); break;
+            case 2: am.markAttendance(); break;
+            case 3: am.updateAttendance(); break;
+        }
+    } while (choice != 4);
+}
+
+void reportsMenu(AttendanceManager& am) {
+    int choice;
+    do {
+        Utils::clearScreen();
+        cout << "\n=== REPORTS ===\n";
+        cout << "1. View Session Report\n";
+        cout << "2. Back to Main\n";
+        cout << "Choice: ";
+        cin >> choice;
+        
+        if (choice == 1) am.viewSessionReport();
+    } while (choice != 2);
+}
+
+int main() {
+    StudentManager sm;
+    AttendanceManager am(&sm);
+    
+    int choice;
+    do {
+        Utils::clearScreen();
+        cout << "========================================\n";
+        cout << "   DIGITAL ATTENDANCE SYSTEM\n";
+        cout << "========================================\n";
+        cout << "1. Student Management\n";
+        cout << "2. Attendance Management\n";
+        cout << "3. Reports\n";
+        cout << "4. Save & Exit\n";
+        cout << "========================================\n";
+        cout << "Choice: ";
+        cin >> choice;
+        
+        switch(choice) {
+            case 1: studentMenu(sm); break;
+            case 2: attendanceMenu(am); break;
+            case 3: reportsMenu(am); break;
+            case 4:
+                cout << "\nSaving...\n";
+                sm.saveStudentsToFile();
+                am.saveAllSessions();
+                cout << "Goodbye!\n";
+                break;
+        }
+    } while (choice != 4);
+    
+    return 0;
+}
