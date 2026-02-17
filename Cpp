@@ -1,0 +1,30 @@
+// Add this method to AttendanceManager.cpp
+bool AttendanceManager::loadAllSessions() {
+    sessions.clear();
+    
+    #ifdef _WIN32
+    system("dir /b session_*.txt > session_list.txt 2>nul");
+    #else
+    system("ls session_*.txt > session_list.txt 2>/dev/null");
+    #endif
+    
+    ifstream list("session_list.txt");
+    if (!list) return false;
+    
+    string filename;
+    while (getline(list, filename)) {
+        // Remove carriage return on Windows
+        if (!filename.empty() && filename.back() == '\r') 
+            filename.pop_back();
+        
+        AttendanceSession session;
+        if (session.loadFromFile(filename)) {
+            sessions.push_back(session);
+            cout << "Loaded: " << filename << "\n";
+        }
+    }
+    
+    list.close();
+    remove("session_list.txt");
+    cout << "Loaded " << sessions.size() << " sessions.\n";
+    return
